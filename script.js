@@ -1,5 +1,4 @@
 "use strict";
-// Weather API Key - 4b353eec9a0f5405e39ba36498da85f9
 
 // Lat nd LON by City API call URL - http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=4b353eec9a0f5405e39ba36498da85f9
 
@@ -12,10 +11,12 @@ const cityEl = document.querySelector(".city");
 const humidityEl = document.querySelector(".humidity");
 const windSpeedEl = document.querySelector(".wind");
 const weatherIconEl = document.querySelector(".weather-icon");
+
+// Rendering Weather Data
 const renderWeatherData = function (...weatherDetails) {
   console.log(...weatherDetails);
   const [{ humidity, main, name, speed, temp }] = weatherDetails;
-  temperatureEl.textContent = `${temp}°C`;
+  temperatureEl.textContent = `${Math.round(+temp)}°C`;
   cityEl.textContent = `${name}`;
   humidityEl.textContent = `${humidity}%`;
   windSpeedEl.textContent = `${speed} km/h`;
@@ -24,34 +25,50 @@ const renderWeatherData = function (...weatherDetails) {
 
 // Function for Getting Coordinates by City Names
 const getCoords = async function (cityName) {
-  const response = await fetch(
-    `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=4b353eec9a0f5405e39ba36498da85f9`
-  );
-  const [{ lat, lon }] = await response.json();
-  return [lat, lon];
+  try {
+    const response = await fetch(
+      `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=4b353eec9a0f5405e39ba36498da85f9`
+    );
+    console.log(response);
+    if (!response.ok) throw new Error("Something Went Wrong, City Not Found");
+    const [{ lat, lon }] = await response.json();
+    if (!lat) throw new Error("Something Went Wrong, City Not Found");
+    return [lat, lon];
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Function for Getting Weather Details by CityName
 const getWeatherData = async function (cityName) {
-  // Getting Coordinates using Cityname
-  const [lat, lon] = await getCoords(cityName);
+  try {
+    // Getting Coordinates using Cityname
+    const [lat, lon] = await getCoords(cityName);
+    if (!lat)
+      throw new Error("Something Went Wrong, Weather Cant be displayed");
 
-  // Getting Weather details using Coordinates
-  const {
-    main: { humidity, temp },
-    wind: { speed },
-    weather: [{ main }],
-    name,
-  } = await fetch(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=4b353eec9a0f5405e39ba36498da85f9`
-  ).then((res) => res.json());
-  // console.log(humidity, temp, speed, main, name);
-  renderWeatherData({ humidity, temp, speed, main, name });
+    // Getting Weather details using Coordinates
+    const {
+      main: { humidity, temp },
+      wind: { speed },
+      weather: [{ main }],
+      name,
+    } = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=4b353eec9a0f5405e39ba36498da85f9`
+    ).then((res) => res.json());
+    renderWeatherData({ humidity, temp, speed, main, name });
+  } catch (error) {
+    throw error;
+  }
 };
 
 buttonEl.addEventListener("click", () => {
-  const searchedCity = inputEl.value;
-  if (!searchedCity) return;
-  getWeatherData(searchedCity);
-  document.querySelector(".weather").style.display = "block";
+  try {
+    const searchedCity = inputEl.value;
+    if (!searchedCity) return;
+    getWeatherData(searchedCity);
+    document.querySelector(".weather").style.display = "block";
+  } catch (err) {
+    console.warn(err);
+  }
 });
