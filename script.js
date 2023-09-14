@@ -27,7 +27,7 @@ const renderWeatherData = function (...weatherDetails) {
 const getCoords = async function (cityName) {
   try {
     const response = await fetch(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=4b353eec9a0f5405e39ba36498da85f9`
+      `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=4b353eec9a0f5405e39ba36498da85f9`
     );
     console.log(response);
     if (!response.ok) throw new Error("Something Went Wrong, City Not Found");
