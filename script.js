@@ -27,7 +27,8 @@ const renderWeatherData = function (...weatherDetails) {
 const getCoords = async function (cityName) {
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=4b353eec9a0f5405e39ba36498da85f9`
+      `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=4b353eec9a0f5405e39ba36498da85f9`,
+      { referrerPolicy: "unsafe_url" }
     );
     console.log(response);
     if (!response.ok) throw new Error("Something Went Wrong, City Not Found");
@@ -54,7 +55,8 @@ const getWeatherData = async function (cityName) {
       weather: [{ main }],
       name,
     } = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=4b353eec9a0f5405e39ba36498da85f9`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=4b353eec9a0f5405e39ba36498da85f9`,
+      { referrerPolicy: "unsafe_url" }
     ).then((res) => res.json());
     renderWeatherData({ humidity, temp, speed, main, name });
   } catch (error) {
